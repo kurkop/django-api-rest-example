@@ -96,6 +96,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    #Add Middleware CORS
+    'corsheaders.middleware.CorsMiddleware',
 )
 
 ROOT_URLCONF = 'restExample.urls'
@@ -121,6 +123,7 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'rest_framework',
+    'corsheaders',
     'restApp',
 )
 
@@ -166,3 +169,5 @@ REST_FRAMEWORK = {
     ],
 }
 
+#CORS response Succefull
+CORS_ORIGIN_ALLOW_ALL = True

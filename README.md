@@ -9,7 +9,8 @@ Clone:
 git clone https://github.com/kurkop/django-api-rest-example
 
 Add modules:
-pip install djangorestframework
-pip install markdown
-pip install django-filter
+-pip install djangorestframework
+-pip install markdown
+-pip install django-filter
+-pip install django-cors-headers
 
