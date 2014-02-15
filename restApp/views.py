@@ -3,13 +3,12 @@ from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
-from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
 from .models import Poll
-from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 from restApp.serializers import UserSerializer, GroupSerializer, PollSerializer
-from rest_framework import permissions
+from rest_framework.permissions import AllowAny
+from rest_framework.views import APIView
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -29,47 +28,52 @@ class GroupViewSet(viewsets.ModelViewSet):
 def index_view(request):
     return HttpResponse("Respuesta :D")
 
-@api_view(['GET', 'POST'])
-@permission_classes((permissions.AllowAny,))
-def poll_list(request):
+class poll_list(APIView):
     """
     List all code polls, or create a new poll.
     """
 
-    if request.method == 'GET':
+    permission_classes = (AllowAny,)
+
+    def get(self, request, format=None):
         polls = Poll.objects.all()
         serializer = PollSerializer(polls, many=True)
         return Response(serializer.data)
 
-    elif request.method == 'POST':
+    def post(self, request, format=None):
         serializer = PollSerializer(data=request.DATA)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET', 'PUT', 'DELETE'])
-@permission_classes((permissions.AllowAny,))
-def poll_detail(request, pk):
+
+class poll_detail(APIView):
     """
     Retrieve, update or delete a snippet instance.
-    """              
-    try:
-        poll = Poll.objects.get(pk=pk)
-    except Poll.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+    """             
+    permission_classes = (AllowAny,)
 
-    if request.method == 'GET':
+    def get_object(self, pk):
+	    try:
+	        return Poll.objects.get(pk=pk)
+	    except Poll.DoesNotExist:
+	        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def get(self, request, pk, format=None):
+    	poll = self.get_object(pk)
         serializer = PollSerializer(poll)
         return Response(serializer.data)
 
-    elif request.method == 'PUT':
+    def put(self, request, pk, format=None):
+    	poll = self.get_object(pk)
         serializer = PollSerializer(poll, data=request.DATA)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    elif request.method == 'DELETE':
+    def delete(self, request, pk, format=None):
+    	poll = self.get_object(pk)
         poll.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
